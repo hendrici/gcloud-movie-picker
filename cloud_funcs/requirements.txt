@@ -1,0 +1,4 @@
+functions-framework==3.*
+Flask==3.0.3
+google-cloud-bigquery==3.11.4
+google-cloud-aiplatform==1.76.0
