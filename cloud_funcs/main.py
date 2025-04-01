@@ -64,7 +64,6 @@ def http_movie_recommender(request):
         # return jsonify({"input_movies": movies, "recommendation_movies": movies_found})
         recommendations = movies_found
         # recommendations = get_ai_recommendations(movies_found)
-        csv_url = save_recommended_gcs(recommendations)
 
         return jsonify({"input_movies": movies, "recommendation_movies": recommendations})
     except Exception as e:

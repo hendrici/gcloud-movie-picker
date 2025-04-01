@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Movie Recommendations</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        input, textarea { display: block; margin: 10px auto; padding: 10px; width: 80%; max-width: 300px; }
-        button { padding: 10px 15px; cursor: pointer; }
-        #output { margin-top: 20px; padding: 10px; border: 1px solid #ccc; display: inline-block; }
-        #recommendations { width: 80%; max-width: 400px; height: 100px; margin-top: 20px; }
-    </style> -->
 </head>
 <body>
     <div class="container1">
@@ -36,15 +29,15 @@
         <p id="user-input"></p>
 
         <h2>Recommended Movies:</h2>
-        <textarea id="recommendation_movies" rows="3" placeholder="Enter movies above to receive top 3 recommended movies here..." readonly></textarea>
+        <textarea id="recommendation_movies" rows="5" placeholder="Enter movies above to receive top 3 recommended movies here..." readonly></textarea>
     </div>
 
     <script>
         function sendMovies() {
             const submitButton = document.getElementById("submit-btn");
-            submitButton.disabled = true; // Disable the button
-            submitButton.style.backgroundColor = "#ccc"; // Gray out button
-            submitButton.innerText = "Loading..."; // Change button text
+            submitButton.disabled = true;
+            submitButton.style.backgroundColor = "#ccc";
+            submitButton.innerText = "Loading...";
             
             const movies = [
                 document.getElementById("movie1").value,
@@ -61,7 +54,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("input_movies").innerText = "You entered: " + data.input_movies.join(", ");
                 document.getElementById("recommendation_movies").value = [...new Set(data.recommendation_movies.map(movie => movie.title))].join("\n");
             })
             .catch(error => {
@@ -69,9 +61,9 @@
                 document.getElementById("recommendation_movies").value = "Error fetching recommendations.";
             })
             .finally(() => {
-                submitButton.disabled = false; // Re-enable button
-                submitButton.style.backgroundColor = "#007bff"; // Restore original color
-                submitButton.innerText = "Submit"; // Reset button text
+                submitButton.disabled = false;
+                submitButton.style.backgroundColor = "#007bff";
+                submitButton.innerText = "Submit";
             });
         }
         function downloadDataset() {
@@ -79,24 +71,4 @@
         }
     </script>
 </body>
-<!-- <body>
-    <h1>AI Movie Recommendations</h1>
-
-    <h2>Enter 5 Movies:</h2>
-
-    <input type="text" id="movie1" placeholder="Enter movie 1">
-    <input type="text" id="movie2" placeholder="Enter movie 2">
-    <input type="text" id="movie3" placeholder="Enter movie 3">
-    <input type="text" id="movie4" placeholder="Enter movie 4">
-    <input type="text" id="movie5" placeholder="Enter movie 5">
-
-    <button onclick="sendMovies()">Submit</button>
-
-    <div id="input_movies" padding-top: 20px>You entered: (No movies yet)</div>
-
-    <h2>Recommended Movies:</h2>
-    <textarea id="recommendation_movies" readonly placeholder="Recommendations will appear here..."></textarea>
-
-    <button onclick="downloadDataset()">Download Movie Dataset</button>
-</body> -->
 </html>

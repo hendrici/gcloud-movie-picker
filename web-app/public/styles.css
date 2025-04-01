@@ -34,7 +34,7 @@ body {
     width: 100%;
 }
 
-/* Input Fields */
+/* Input Text */
 .input-group {
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@ input[type="text"] {
     font-size: 16px;
 }
 
-/* Submit Button */
+/* Button */
 button[type="btn"] {
     background-color: #007BFF;
     color: white;
@@ -64,22 +64,7 @@ button[type="btn"]:hover {
     background-color: #0056b3;
 }
 
-/* #submit-btn {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#submit-btn:hover {
-    background-color: #0056b3;
-} */
-
-/* Recommendations Textarea */
+/* Output Text */
 textarea {
     width: 100%;
     border: 1px solid #ccc;
