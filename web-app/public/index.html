@@ -10,7 +10,7 @@
     <div class="container1">
         <h4> Isaiah Hendrick</h4>
         <h4> CIS 655: Cloud Applications Development</h4>
-        <h5> Dataset courtesy of <a href="https://www.kaggle.com/datasets/joebeachcapital/top-10000-most-popular-movies-from-imdb?resource=download">Kaggle</a></h5>
+        <h5> Dataset courtesy of <a href="https://www.kaggle.com/datasets/grouplens/movielens-20m-dataset">Kaggle</a></h5>
         <button type="btn" id="download-btn" onclick="downloadDataset()">Download Movie Dataset</button>
     </div>
     <div class="container2">
@@ -31,7 +31,9 @@
         <h2>Recommended Movies:</h2>
         <textarea id="recommendation_movies" rows="5" placeholder="Enter movies above to receive top 3 recommended movies here..." readonly></textarea>
     </div>
-
+    <div class="container3">
+        <p>NOTE: Dataset is limited to movies that came out in 2015 and prior. Lesser known movies may not be recognized.</p>
+    </div>
     <script>
         function sendMovies() {
             const submitButton = document.getElementById("submit-btn");

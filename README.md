@@ -1,7 +1,7 @@
 <!-- HEADER -->
 <div align="center">
-  <p style="font-size: 40px;"><b>gcloud-movie-picker</b></p>
-  <p style="font-size: 18px;">Need help finding a movie to watch?</p>
+  <p><b>gcloud-movie-picker</b></p>
+  <p>Need help finding a movie to watch?</p>
   <p>
     <a href="https://hendrick-cis655-finalproject.ue.r.appspot.com/">
       <img src="https://img.shields.io/badge/Click_here_to_use_application!-blue?style=for-the-badge&">
