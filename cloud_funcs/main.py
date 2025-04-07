@@ -1,32 +1,70 @@
 import functions_framework
 import json
 from flask import request, jsonify
-from google.cloud import bigquery, aiplatform
+from google.cloud import bigquery
+from rapidfuzz import process, fuzz
+import google.auth
+import google.auth.transport.requests
+import requests
 
-def get_ai_recommendations(movies):
-    pass
-    # """Calls Vertex AI AutoML model for movie recommendations."""
-    # PROJECT_ID = "your-project-id"
-    # LOCATION = "us-central1"
-    # MODEL_ID = "your-model-id"
+query_client = bigquery.Client()
+query = "SELECT title, movieId FROM `hendrick-cis655-finalproject.bq_movies.movies`"
 
-    # # Create endpoint client
-    # endpoint = aiplatform.Endpoint(
-    #     endpoint_name=f"projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/{MODEL_ID}"
-    # )
+movie_list = [(row["title"], row["movieId"]) for row in query_client.query(query)]
+movie_titles_list = [title for title, _ in movie_list]
 
-    # # Format input
-    # instances = [{"title": movie} for movie in movies]
+def get_movie_id(user_input):
+    best_match = process.extractOne(user_input, movie_titles_list, scorer=fuzz.token_set_ratio)
+    if best_match:
+        matched_title = best_match[0]
+        movie_id = next(mId for title, mId in movie_list if title == matched_title)
+        return movie_id
 
-    # # Call Vertex AI model
-    # response = endpoint.predict(instances=instances)
+    return None
 
-    # # Extract predictions
-    # predictions = response.predictions
-    # recommended_movies = [pred["title"] for pred in predictions[:3]]
 
-    # return recommended_movies
-    
+def get_movie_title(movie_id):
+    movie_title = next(title for title, mId in movie_list if mId == movie_id)
+    return movie_title
+
+
+def send_request_to_ai_model(movie_ids):
+    credentials, _ = google.auth.default()
+    auth_req = google.auth.transport.requests.Request()
+    credentials.refresh(auth_req)
+    access_token = credentials.token
+
+    model_url = "https://retail.googleapis.com/v2/projects/hendrick-cis655-finalproject/locations/global/catalogs/default_catalog/servingConfigs/movie-recommender-config:predict"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    user_event = {
+        "userEvent": {
+            "eventType": "detail-page-view",
+            "visitorId": "visitor-123",
+            "productDetails": [{"product": {"id": str(movie_id)}} for movie_id in movie_ids]
+        },
+        "pageSize": 3
+    }
+
+    response = requests.post(model_url, headers=headers, json=user_event)
+    if response.status_code != 200:
+        return {"error": response.text}, response.status_code
+
+    return response.json()
+
+
+def get_recommendations(user_movies):
+    movie_ids = [get_movie_id(title) for title in user_movies if get_movie_id(title)]
+    response = send_request_to_ai_model(movie_ids)
+
+    recommended_movies = [get_movie_title(int(movie["id"])) for movie in response["results"][:3]]
+    return recommended_movies
+
+
 @functions_framework.http
 def http_movie_recommender(request):
     try: 
@@ -39,32 +77,6 @@ def http_movie_recommender(request):
         if not movies:
             return jsonify({"error": "No movies provided"}), 400
 
-        query_client = bigquery.Client()
-
-        placeholders = ", ".join([f"@movie_{i}" for i in range(len(movies))])
-        query = f"""
-            SELECT title, genres, vote_avg, vote_cnt
-            FROM `hendrick-cis655-finalproject.bq_movies.tmdb_movie_list`
-            WHERE title IN ({placeholders})
-            ORDER BY vote_avg DESC
-        """
-
-        query_params = [
-            bigquery.ScalarQueryParameter(f"movie_{i}", "STRING", movie)
-            for i, movie in enumerate(movies)
-        ]
-
-        job_config = bigquery.QueryJobConfig(query_parameters=query_params)
-        query_job = query_client.query(query, job_config=job_config)
-
-        movies_found = [
-            {"title": row["title"], "genre": row["genres"], "vote_avg": row["vote_avg"]}
-            for row in query_job
-        ]
-        # return jsonify({"input_movies": movies, "recommendation_movies": movies_found})
-        recommendations = movies_found
-        # recommendations = get_ai_recommendations(movies_found)
-
-        return jsonify({"input_movies": movies, "recommendation_movies": recommendations})
+        return jsonify({"recommendation_movies": get_recommendations(movies)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
