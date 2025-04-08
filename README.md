@@ -25,7 +25,7 @@ Need help finding a movie to watch?
     <ul>
       <li><a href="#cloud-storage">Cloud Storage</a></li>
       <li><a href="#big-query">Big Query</a></li>
-      <li><a href="#vertex-ai">Vertex AI</a></li>
+      <li><a href="#vertex-ai-search-for-commerce">Vertex AI (Search for Commerce)</a></li>
       <li><a href="#cloud-run">Cloud Run</a></li>
       <li><a href="#app-engine">App Engine</a></li>
     </ul>
