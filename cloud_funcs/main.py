@@ -16,6 +16,16 @@ movie_list = [(row["title"], row["movieId"]) for row in query_client.query(query
 movie_titles_list = [title for title, _ in movie_list]
 
 def get_movie_id(user_input):
+    """
+        Convert a given movie title from user input to the best title match within the dataset, then 
+        return the associated movie ID.
+
+        Args:
+            user_input: Movie title from user input.
+
+        Returns:
+            Movie ID of closest movie title match with user input.
+    """
     best_match = process.extractOne(user_input, movie_titles_list, scorer=fuzz.token_set_ratio)
     if best_match:
         matched_title = best_match[0]
@@ -26,11 +36,29 @@ def get_movie_id(user_input):
 
 
 def get_movie_title(movie_id):
+    """
+        Convert a given movie ID to its associated movie title using the movie list (generated from BigQuery query). 
+
+        Args:
+            movie_id: ID of movie within dataset.
+
+        Returns:
+            Movie title associated with the provided movie ID.
+    """
     movie_title = next(title for title, mId in movie_list if mId == movie_id)
     return movie_title
 
 
 def send_request_to_ai_model(movie_ids):
+    """
+        Generate authenticated access token and invoke AI model with HTTP request, sending list of user inputted movies.
+
+        Args:
+            movie_ids: List of user input movie IDs.
+
+        Returns:
+            Json response of recommended movies from AI model.
+    """
     credentials, _ = google.auth.default()
     auth_req = google.auth.transport.requests.Request()
     credentials.refresh(auth_req)
@@ -60,6 +88,16 @@ def send_request_to_ai_model(movie_ids):
 
 
 def get_recommendations(user_movies):
+    """
+        Get closest title matches from user input and convert to movie IDs, send request to AI model,
+        convert resulting recommended movie IDs to movie titles.
+     
+        Args:
+            user_movies: List of movies title input from the user. 
+
+        Returns:
+            The recommended movie titles from the Vertex AI model.
+    """
     movie_ids = [get_movie_id(title) for title in user_movies if get_movie_id(title)]
     response = send_request_to_ai_model(movie_ids)
 
@@ -69,6 +107,17 @@ def get_recommendations(user_movies):
 
 @functions_framework.http
 def http_movie_recommender(request):
+    """
+        This is the enter point for the Cloud Run function, the input movies from the user 
+        are received and processed before being sent to the Vertex AI. After the response from
+        the model, the resulting recommended movies are processed and then returned.
+
+        Args:
+            request: List of user input movies in json format.
+
+        Returns:
+            Returns recommended movies in json format.
+    """
     try: 
         request_json = request.get_json()
 
