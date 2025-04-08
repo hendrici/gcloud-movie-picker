@@ -7,8 +7,10 @@ import google.auth
 import google.auth.transport.requests
 import requests
 
+PROJECT_ID = "hendrick-cis655-finalproject"
+
 query_client = bigquery.Client()
-query = "SELECT title, movieId FROM `hendrick-cis655-finalproject.bq_movies.movies`"
+query = f"SELECT title, movieId FROM `{PROJECT_ID}.bq_movies.movies`"
 
 movie_list = [(row["title"], row["movieId"]) for row in query_client.query(query)]
 movie_titles_list = [title for title, _ in movie_list]
@@ -34,7 +36,7 @@ def send_request_to_ai_model(movie_ids):
     credentials.refresh(auth_req)
     access_token = credentials.token
 
-    model_url = "https://retail.googleapis.com/v2/projects/hendrick-cis655-finalproject/locations/global/catalogs/default_catalog/servingConfigs/movie-recommender-config:predict"
+    model_url = f"https://retail.googleapis.com/v2/projects/{PROJECT_ID}/locations/global/catalogs/default_catalog/servingConfigs/movie-recommender-config:predict"
 
     headers = {
         "Authorization": f"Bearer {access_token}",
